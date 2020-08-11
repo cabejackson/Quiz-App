@@ -70,7 +70,7 @@ clean up design with css
 
 
 function addHtml() {
-  let question = store.questions[counter];
+  let question = store.questions[store.questionNumber];
   return `<div class ='question-box'>
   <img src="photos/kelly-ryan.png" alt="Kelly and Ryan">
   <div class= 'question'>${question.question}</div>
@@ -102,14 +102,14 @@ function submitAnswer() {
   $('main').on('submit', 'form#questions', function (event) {
     event.preventDefault();
     let answer = $('input[name=answers]:checked').val();
-    if (store.questions[counter].correctAnswer === answer) {
+    if (store.questions[store.questionNumber].correctAnswer === answer) {
       alert('GOOD JOB')
       store.score++;
     } else {
       alert('Horrible job, you suck!')
       wrong++
     }
-    counter++
+    store.questionNumber++
     renderPage();
   })
 }
