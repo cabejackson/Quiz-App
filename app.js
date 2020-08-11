@@ -60,7 +60,13 @@ const store = {
 let counter = 0;
 
 let wrong = 0;
-
+/*
+TODO:
+track questions by question number
+assign counter for home, question pages, end
+assign correct feedback
+clean up design with css
+*/
 
 
 function addHtml() {
@@ -82,38 +88,15 @@ function addHtml() {
   <h3><span>Question #${store.questionNumber + 1} / 5 </span><span>You have: ${store.score} Correct Answers, and ${wrong} Incorrect Answer!</span></h3>`
 }
 
-function addHtmlFeedback() {
-  let question = store.questions[counter];
-  return `<div class ='question-box'>
-  <img src="photos/kelly-ryan.png" alt="Kelly and Ryan">
-  <div class= 'question'>${question.question}</div>
-  <form id='questions'>
-      <input id='answer1' name = 'answers' type= 'radio' value = '${question.answers[0]}'>
-      <label for= 'answer1'>${question.answers[0]}</label><br>
-      <input id='answer2' name = 'answers' type= 'radio' value = '${question.answers[1]}'>
-      <label for= 'answer2'>${question.answers[1]}</label><br>
-      <input id='answer3' name = 'answers' type= 'radio' value = '${question.answers[2]}'>
-      <label for= 'answer3'>${question.answers[2]}</label><br>
-      <input id='answer4' name = 'answers' type= 'radio' value = '${question.answers[3]}'>
-      <label for= 'answer4'>${question.answers[3]}</label><br>
-      <button class = 'submit-answer' type = 'submit'>Submit Answer!</button>
-  </form>
-  <h3><span>Question #${store.questionNumber + 1} / 5 </span><span>You have: ${store.score} Correct Answers, and ${wrong} Incorrect Answer!</span></h3>
-  <h2>${feedback}</h2>`
-}
-
 
 function renderPage() {
   console.log('renderPage. . . . Has Run :)')
+  if (counter <= 4){
   let html = addHtml();
   $('main').html(html)
-
+  }
 }
 
-function renderFeedback(){
-  let html = addHtmlFeedback();
-  $('main').html(html);
-}
 
 function submitAnswer() {
   $('main').on('submit', 'form#questions', function (event) {
