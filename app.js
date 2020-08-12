@@ -71,14 +71,16 @@ tracking questions by question number
 assign counter for home, question pages, end 
 assign correct feedback + values
 restart quiz works!
-At the end it now displays you score %
+At the end it now displays your score %
+
 
 
 TODO:
 create an array of images to link to the correct question#
-create a badResult in addHtml for failing grades
-Find a way to make the next question button after q5 say Results instead of next question (This will be REALLL FUN)
-clean up the page alignment between results and questions in css
+create a badResult in addHtml for failing grades -- createed a results function
+require answers -- added require to radio buttons
+Find a way to make the next question button on q5 feedback say Results instead of next question (This will be REALLL FUN) -- added other conditions
+clean up the page alignment between results and questions in css --?
 css for mobile first design
 css for design and accessibility
 
@@ -99,17 +101,52 @@ function addHtml() {
 <img src="photos/kelly-ryan.png" alt="Kelly and Ryan">
 <div class= 'question'>${question.question}</div>
 <form id='questions'>
-    <input id='answer1' name = 'answers' type= 'radio' value = '${question.answers[0]}'>
+    <input id='answer1' name = 'answers' type= 'radio' value = '${question.answers[0]}' required>
     <label for= 'answer1'>${question.answers[0]}</label><br>
-    <input id='answer2' name = 'answers' type= 'radio' value = '${question.answers[1]}'>
+    <input id='answer2' name = 'answers' type= 'radio' value = '${question.answers[1]}' required>
     <label for= 'answer2'>${question.answers[1]}</label><br>
-    <input id='answer3' name = 'answers' type= 'radio' value = '${question.answers[2]}'>
+    <input id='answer3' name = 'answers' type= 'radio' value = '${question.answers[2]}' required>
     <label for= 'answer3'>${question.answers[2]}</label><br>
-    <input id='answer4' name = 'answers' type= 'radio' value = '${question.answers[3]}'>
+    <input id='answer4' name = 'answers' type= 'radio' value = '${question.answers[3]}' required>
     <label for= 'answer4'>${question.answers[3]}</label><br>
     <button class = 'submit-answer' type = 'submit'>Submit Answer!</button>
 </form>
 <h3><span>Question #${store.questionNumber + 1} / 5 </span><span>Your Score: ${store.score} Correct, and ${wrong} Incorrect!</span></h3>`;
+
+//moved this to results function
+//   let goodResult = `<div>
+// <img src= "photos/happy-stanley.png" alt="Happy Stanley">
+// <h2>Nice Job!</h2>
+// <p>${(store.score / 5) * 100}%</p>
+// <button class="button-restart-quiz">START QUIZ AGAIN!</button>
+// </div> `;
+
+// let badResult = 
+// `<div>
+// <img src= "photos/stanley-fail.png" alt="Sad Stanley">
+// <h2>You failed!</h2>
+// <p>${(store.score / 5) * 100}%</p>
+// <button class="button-restart-quiz">START QUIZ AGAIN!</button>
+// </div> `;
+//what is this counter counting?
+  if (counter === 1) {
+    return startPage;
+  }
+
+  if (counter === 2) {
+    return questionPage;
+  }
+
+  if (counter === 3){
+    return results();
+  }
+  
+}
+
+//function that gives goodResult vs badResult on last page
+function results (){
+  let results = store.score;
+  //console.log(results, 'results are coming up!');
 
   let goodResult = `<div>
 <img src= "photos/happy-stanley.png" alt="Happy Stanley">
@@ -118,17 +155,19 @@ function addHtml() {
 <button class="button-restart-quiz">START QUIZ AGAIN!</button>
 </div> `;
 
-  if (counter === 1) {
-    return startPage;
-  }
+let badResult = 
+`<div>
+<img src= "photos/stanley-fail.jpg" alt="Sad Stanley">
+<h2>You failed!</h2>
+<p>${(store.score / 5) * 100}%</p>
+<button class="button-restart-quiz">START QUIZ AGAIN!</button>
+</div> `;
 
-  if (counter === 2) {
-    return questionPage;
-
-  }
-
-  if (counter === 3) {
+  if (results >= 4){
     return goodResult;
+  }
+  else{
+    return badResult;
   }
 
 }
@@ -152,9 +191,32 @@ function addHtmlFeedback() {
 <h3><span>Question #${store.questionNumber + 1} / 5 </span>
 <span>Your Score: ${store.score} Correct, and ${wrong} Incorrect!</span></h3>`;
 
-  if (isCorrect === true) {
+  let getResultsButtonIncorrect = `<div class ='question-box'>
+<img src="photos/kelly-ryan.png" alt="Kelly and Ryan">
+<div class= 'question'>${question.question}</div>
+<div class ='reults'>Oh no, you got it wrong! ${question.correctAnswer} is the correct answer.</div>
+<button id= "next" type= "submit" class= 'next-question'>Get Results!</button>
+<h3><span>Question #${store.questionNumber + 1} / 5 </span>
+<span>Your Score: ${store.score} Correct, and ${wrong} Incorrect!</span></h3>`;
+  let getResultsButtonCorrect = `<div class ='question-box'>
+<img src="photos/kelly-ryan.png" alt="Kelly and Ryan">
+<div class= 'question'>${question.question}</div>
+<div class ='reults'>Great Job! ${question.correctAnswer} is correct!</div>
+<button id= "next" type= "submit" class= 'next-question'>Get Results!</button>
+<h3><span>Question #${store.questionNumber + 1} / 5 </span>
+<span>Your Score: ${store.score} Correct, and ${wrong} Incorrect!</span></h3>`;
+
+  if (isCorrect === true && store.questionNumber === 4) {
+    //console.log(store.questionNumber, 'is the question number ');
+    return getResultsButtonCorrect;
+  } 
+  else if (isCorrect === false && store.questionNumber === 4) {
+    return getResultsButtonIncorrect;
+  }
+  else if (isCorrect === true) {
     return correct;
-  } else {
+  }
+  else {
     return Incorrect;
   }
 }
