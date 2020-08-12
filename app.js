@@ -1,4 +1,5 @@
 'use strict';
+//Our data including questions!
 const store = {
 
   questions: [
@@ -60,15 +61,30 @@ const store = {
 let counter = 1;
 
 let wrong = 0;
+
+let isCorrect = true;
+
 /*
+Change log:
+--These are done :) --
+tracking questions by question number 
+assign counter for home, question pages, end 
+assign correct feedback + values
+restart quiz works!
+At the end it now displays you score %
+
+
 TODO:
-track questions by question number -- DONE
-assign counter for home, question pages, end
-assign correct feedback
-clean up design with css
+create an array of images to link to the correct question#
+create a badResult in addHtml for failing grades
+Find a way to make the next question button after q5 say Results instead of next question (This will be REALLL FUN)
+clean up the page alignment between results and questions in css
+css for mobile first design
+css for design and accessibility
+
 */
 
-
+// Adds html elements to be rendered by renderPage
 function addHtml() {
   let question = store.questions[store.questionNumber];
   let startPage = `<div>
@@ -76,7 +92,7 @@ function addHtml() {
   <button id= "start" type= "submit" class= 'mainPage'>Start The Quiz!</button>
   <p>Welcome to a difficult quiz on the hit TV show The Office. This Quiz is very hard and you will be graded!</p>
   <img src="photos/dwight-main.jpg" alt="Dwight Main">
-</div>`
+</div>`;
 
 
   let questionPage = `<div class ='question-box'>
@@ -93,14 +109,14 @@ function addHtml() {
     <label for= 'answer4'>${question.answers[3]}</label><br>
     <button class = 'submit-answer' type = 'submit'>Submit Answer!</button>
 </form>
-<h3><span>Question #${store.questionNumber + 1} / 5 </span><span>You have: ${store.score} Correct Answers, and ${wrong} Incorrect Answer!</span></h3>`
+<h3><span>Question #${store.questionNumber + 1} / 5 </span><span>Your Score: ${store.score} Correct, and ${wrong} Incorrect!</span></h3>`;
 
-let goodResult = `<div>
+  let goodResult = `<div>
 <img src= "photos/happy-stanley.png" alt="Happy Stanley">
 <h2>Nice Job!</h2>
-<p>You got blank!</p>
+<p>${(store.score / 5) * 100}%</p>
 <button class="button-restart-quiz">START QUIZ AGAIN!</button>
-</div> `
+</div> `;
 
   if (counter === 1) {
     return startPage;
@@ -111,71 +127,107 @@ let goodResult = `<div>
 
   }
 
-  if (counter === 3){
+  if (counter === 3) {
     return goodResult;
   }
 
-
-
-
 }
 
+// adds html elements to be added by renderFeedback
+function addHtmlFeedback() {
+  let question = store.questions[store.questionNumber];
+  let correct = `<div class ='question-box'>
+<img src="photos/kelly-ryan.png" alt="Kelly and Ryan">
+<div class= 'question'>${question.question}</div>
+<div class ='reults'>Great Job! ${question.correctAnswer} is correct!</div>
+<button id= "next" type= "submit" class= 'next-question'>Next Question!</button>
+<h3><span>Question #${store.questionNumber + 1} / 5 </span>
+<span>Your Score: ${store.score} Correct, and ${wrong} Incorrect!</span></h3>`;
+
+  let Incorrect = `<div class ='question-box'>
+<img src="photos/kelly-ryan.png" alt="Kelly and Ryan">
+<div class= 'question'>${question.question}</div>
+<div class ='reults'>Oh no, you got it wrong! ${question.correctAnswer} is the correct answer.</div>
+<button id= "next" type= "submit" class= 'next-question'>Next Question!</button>
+<h3><span>Question #${store.questionNumber + 1} / 5 </span>
+<span>Your Score: ${store.score} Correct, and ${wrong} Incorrect!</span></h3>`;
+
+  if (isCorrect === true) {
+    return correct;
+  } else {
+    return Incorrect;
+  }
+}
+
+//renders the feedback options prior to advancing to the next question
+function renderFeedback() {
+  let html = addHtmlFeedback();
+  $('main').html(html);
+  
+}
+//simple function that starts the quiz from the main page.
 function startQuiz() {
-  $('button#start').on('click', function (event) {
+  $('main').on('click', '.mainPage', function (event) {
     event.preventDefault();
-    counter++
-    //console.log('After Click '+counter)
-    renderPage()
-  })
+    counter++;
+    renderPage();
+  });
 }
 
-
+//The OG himself, renderus ulmitius. This function renders the page for non feedback renders.
 function renderPage() {
-  console.log('renderPage. . . . Has Run :)')
   let html = addHtml();
-  $('main').html(html)
+  $('main').html(html);
 
 }
 
-
+//This function tracks your score on submiting your answer and moves you forward.
 function submitAnswer() {
   $('main').on('submit', 'form#questions', function (event) {
     event.preventDefault();
     let answer = $('input[name=answers]:checked').val();
     if (store.questions[store.questionNumber].correctAnswer === answer) {
-      alert('GOOD JOB')
+      isCorrect = true;
       store.score++;
+      renderFeedback();
     } else {
-      alert('Horrible job, you suck!')
-      wrong++
+      wrong++;
+      isCorrect = false;
+      renderFeedback();
     }
-    store.questionNumber++
-    renderPage();
-    console.log(`This is the Q# ${store.questionNumber}`)
-  })
+  });
 }
-
-let feedback = '';
-
-
+//This function allows you to resume the quiz after seeing the correct answer to the question you just answered!
+function resumeQuiz() {
+  $('main').on('click', '.next-question', function (event) {
+    event.preventDefault();
+    if (store.questionNumber < 4) {
+      store.questionNumber++;
+      renderPage();
+    } else {
+      counter++;
+      renderPage();
+    }
+  });
+}
+//This function clears all counters and score and send you back to the start!
+function restartQuiz() {
+  $('main').on('click', '.button-restart-quiz', function (event) {
+    event.preventDefault();
+    store.questionNumber = 1;
+    counter = 1;
+    store.score = 0;
+    wrong = 0;
+    renderPage();
+  });
+}
+//The main function holding all the functions that need to be initialized!
 function main() {
   renderPage();
   startQuiz();
   submitAnswer();
-
-  //console.log(counter)
+  resumeQuiz();
+  restartQuiz();
 }
 
-$(main)
-/**
- *
- * Your app should include a render() function, that regenerates
- * the view each time the store is updated. See your course
- * material, consult your instructor, and reference the slides
- * for more details.
- *
- * NO additional HTML elements should be added to the index.html file.
- *
- * You may add attributes (classes, ids, etc) to the existing HTML elements, or link stylesheets or additional scripts if necessary
- *
- */
+$(main);
