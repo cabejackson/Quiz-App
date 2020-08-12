@@ -214,7 +214,7 @@ function resumeQuiz() {
 function restartQuiz() {
   $('main').on('click', '.button-restart-quiz', function (event) {
     event.preventDefault();
-    store.questionNumber = 1;
+    store.questionNumber = 0;
     counter = 1;
     store.score = 0;
     wrong = 0;
