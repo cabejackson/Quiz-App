@@ -291,5 +291,5 @@ function main() {
   resumeQuiz();
   restartQuiz();
 }
-
+//here's a comment to see if git status changes
 $(main);
